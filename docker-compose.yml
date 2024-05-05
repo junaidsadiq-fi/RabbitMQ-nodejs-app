@@ -1,0 +1,45 @@
+version: '3'
+services:
+  server-a:
+    build:
+      context: ./backend/server-a
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    depends_on:
+      - rabbitmq
+    command: ["sh", "-c", "./utils/wait-for-it.sh rabbitmq:5672 -- npm start"]
+    volumes:
+      - ./backend/server-a/utils:/app/utils
+    networks:
+      - backend
+    environment:
+      - RABBIT_HOST=rabbitmq
+
+  server-b:
+    build:
+      context: ./backend/server-b
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbitmq
+    command: ["sh", "-c", "./utils/wait-for-it.sh rabbitmq:5672 -- npm start"]
+    volumes:
+      - ./backend/server-b/utils:/app/utils
+    environment:
+      - RABBIT_HOST=rabbitmq
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+    networks:
+      - backend
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - backend
+
+networks:
+  backend:
+

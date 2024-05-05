@@ -1,0 +1,12 @@
+{
+    "dependencies": {
+        "amqplib": "^0.10.4",
+        "body-parser": "^1.x",
+        "cors": "^2.8.5",
+        "express": "^4.x",
+        "ws": "^8.17.0"
+    },
+    "scripts": {
+        "start": "node src/app.js"
+    }
+}
