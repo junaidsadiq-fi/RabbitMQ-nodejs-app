@@ -20,20 +20,15 @@ module.exports.addTask = function (rabbitHost, queueName, order) {
               {},
               function (err, ok) {
                 if (err !== null) {
-                  console.log("-------------");
                   console.warn(new Date(), "Message nacked!", err);
-                  console.log("-------------");
                 } else {
-                  console.log("-------------");
                   console.log(new Date(), "Message acked");
-                  console.log("-------------");
                 }
               }
             );
           })
           .finally(() => {
             setTimeout(() => {
-              // Give it some time to process
               ch.close();
               conn.close();
             }, 500);

@@ -1,6 +1,6 @@
 const { addTask } = require("../../../rabbit-utils/sendTask.js");
 const WebSocket = require('ws');
-
+const rabbitHost = process.env.RABBIT_HOST || 'localhost'; 
 let orders = new Map();
 
 exports.getAllOrders = (req, res) => {
@@ -12,7 +12,7 @@ exports.createOrder = (req, res) => {
   const newOrder = createNewOrder(req.body.sandwiches);
   orders.set(newOrder.id, newOrder);
 
-  addTask(process.env.RABBIT_HOST, "order_queue", newOrder);
+  addTask(rabbitHost, "order_queue", newOrder);
 
   res.status(201).json(newOrder);
 };

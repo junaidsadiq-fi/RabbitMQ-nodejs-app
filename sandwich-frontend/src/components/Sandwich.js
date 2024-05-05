@@ -18,7 +18,7 @@ const Sandwich = ({ sandwiches }) => {
   return (
     <div className="">
       <Navbar />
-      <div className="mx-16 mt-16">
+      <div className="mx-48 mt-16">
         <div className="m-4 border rounded-lg p-4">
           <img
             src={sandwich.image}

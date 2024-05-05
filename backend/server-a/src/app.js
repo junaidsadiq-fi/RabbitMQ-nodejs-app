@@ -36,7 +36,7 @@ app.use(
 
 app.use(bodyParser.json());
 
-// Import routes
+// routes
 require("./api/routes/routes")(app); 
 
 const PORT = process.env.PORT || 3001;

@@ -19,37 +19,37 @@ function App() {
     event.preventDefault();
     let formValue = post.trim();
 
-    if (!isNaN(formValue) && formValue !== "" && formValue > 0) {
+    if (!isNaN(formValue) && formValue !== '' && formValue > 0) {
       try {
-        const response = await fetch("http://localhost:3001/order", {
-          method: "POST",
+        const response = await fetch('http://localhost:3001/order', {
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ sandwichId: Number(formValue) }),
+          body: JSON.stringify({ "sandwichId": Number(formValue) }),
         });
 
         if (response.ok) {
           const body = await response.json();
-          setOrderText("Order created successfully! Order information:");
+          setOrderText('Order created successfully! Order information:');
           setCreatedOrder(body);
-          setOrderTextColor("DarkGreen");
+          setOrderTextColor('DarkGreen');
         } else {
-          setOrderText("Order creation failed!");
+          setOrderText('Order creation failed!');
           setCreatedOrder({ id: "-", sandwichId: "-", status: "-" });
-          setOrderTextColor("DarkRed");
+          setOrderTextColor('DarkRed');
         }
       } catch (error) {
-        console.error("Error:", error);
-        setOrderText("Order creation failed due to network error!");
+        console.error('Error:', error);
+        setOrderText('Order creation failed due to network error!');
         setCreatedOrder({ id: "-", sandwichId: "-", status: "-" });
-        setOrderTextColor("DarkRed");
+        setOrderTextColor('DarkRed');
       }
     } else {
-      setOrderText("Order creation failed!");
+      setOrderText('Order creation failed!');
       setCreatedOrder({ id: "-", sandwichId: "-", status: "-" });
-      setOrderTextColor("DarkRed");
-      alert("Check input! Only numbers and no empty input!");
+      setOrderTextColor('DarkRed');
+      alert("Check input! Only numbers and no empty input!")
     }
   };
 
@@ -57,11 +57,9 @@ function App() {
     event.preventDefault();
     let formValue = sandwichId.trim();
 
-    if (!isNaN(formValue) && formValue !== "" && formValue > 0) {
+    if (!isNaN(formValue) && formValue !== '' && formValue > 0) {
       try {
-        const response = await fetch(
-          `http://localhost:3001/order/${sandwichId}`
-        );
+        const response = await fetch(`http://localhost:3001/order/${sandwichId}`);
 
         if (response.ok) {
           const body = await response.json();
@@ -69,27 +67,22 @@ function App() {
           setFetchedSandwichId(body.sandwichId);
           setFetchedStatus(body.status);
         } else {
-          alert("There was no order with the given ID!");
+          alert('There was no order with the given ID!');
         }
       } catch (error) {
-        console.error("Error:", error);
-        alert("Failed to fetch order due to network error!");
+        console.error('Error:', error);
+        alert('Failed to fetch order due to network error!');
       }
     } else {
-      alert("Check input! Only numbers and no empty input!");
+      alert("Check input! Only numbers and no empty input!")
     }
   };
 
   const getAllOrders = async (event) => {
     event.preventDefault();
-    try {
-      const response = await fetch("http://localhost:3001/order");
-      const body = await response.json();
-      setAllSandwiches(body);
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Failed to fetch all orders due to network error!");
-    }
+    const response = await fetch('http://localhost:3001/order');
+    const body = await response.json();
+    setAllSandwiches(body);
   };
 
   const chooseStatusColor = (state) => {
@@ -153,13 +146,6 @@ function App() {
             Check
           </button>
         </form>
-        {allSandwiches.map((sandwich) => (
-          <li key={sandwich.id} className="list-none">
-            Sandwich ID: {sandwich.id} | Name: {sandwich.name} | Price:{" "}
-            {sandwich.price}
-            <img src={sandwich.image} alt={sandwich.name} />
-          </li>
-        ))}
 
         <h4>
           Order ID: {fetchedOrderId} | Sandwich ID: {fetchedSandwichId} |
