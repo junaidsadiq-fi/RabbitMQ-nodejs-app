@@ -9,6 +9,10 @@ exports.getAllOrders = (req, res) => {
 };
 
 exports.createOrder = (req, res) => {
+  if (!req.body || !Array.isArray(req.body.sandwiches)) {
+    return res.status(400).json({ error: 'Invalid sandwiches data' });
+  }
+
   const newOrder = createNewOrder(req.body.sandwiches);
   orders.set(newOrder.id, newOrder);
 
