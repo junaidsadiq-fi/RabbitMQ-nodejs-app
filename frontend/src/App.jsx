@@ -19,31 +19,37 @@ function App() {
     event.preventDefault();
     let formValue = post.trim();
 
-    if (!isNaN(formValue) && formValue !== '' && formValue > 0) {
-      const response = await fetch('http://localhost:3001/order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ "sandwichId": Number(formValue) }),
-      });
+    if (!isNaN(formValue) && formValue !== "" && formValue > 0) {
+      try {
+        const response = await fetch("http://localhost:3001/order", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ sandwichId: Number(formValue) }),
+        });
 
-      if (response.status !== 404) {
-        const body = await response.json();
-        setOrderText('Order created successfully! Order information:');
-        setCreatedOrder(body);
-        setOrderTextColor('DarkGreen');
-      } else {
-        setOrderText('Order creation failed!');
+        if (response.ok) {
+          const body = await response.json();
+          setOrderText("Order created successfully! Order information:");
+          setCreatedOrder(body);
+          setOrderTextColor("DarkGreen");
+        } else {
+          setOrderText("Order creation failed!");
+          setCreatedOrder({ id: "-", sandwichId: "-", status: "-" });
+          setOrderTextColor("DarkRed");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        setOrderText("Order creation failed due to network error!");
         setCreatedOrder({ id: "-", sandwichId: "-", status: "-" });
-        setOrderTextColor('DarkRed');
+        setOrderTextColor("DarkRed");
       }
-
     } else {
-      setOrderText('Order creation failed!');
+      setOrderText("Order creation failed!");
       setCreatedOrder({ id: "-", sandwichId: "-", status: "-" });
-      setOrderTextColor('DarkRed');
-      alert("Check input! Only numbers and no empty input!")
+      setOrderTextColor("DarkRed");
+      alert("Check input! Only numbers and no empty input!");
     }
   };
 
@@ -51,27 +57,39 @@ function App() {
     event.preventDefault();
     let formValue = sandwichId.trim();
 
-    if (!isNaN(formValue) && formValue !== '' && formValue > 0) {
-      const response = await fetch(`http://localhost:3001/order/${sandwichId}`);
+    if (!isNaN(formValue) && formValue !== "" && formValue > 0) {
+      try {
+        const response = await fetch(
+          `http://localhost:3001/order/${sandwichId}`
+        );
 
-      if (response.status !== 404) {
-        const body = await response.json();
-        setFetchedOrderId(body.id);
-        setFetchedSandwichId(body.sandwichId);
-        setFetchedStatus(body.status);
-      } else {
-        alert('There was no order with the given ID!');
+        if (response.ok) {
+          const body = await response.json();
+          setFetchedOrderId(body.id);
+          setFetchedSandwichId(body.sandwichId);
+          setFetchedStatus(body.status);
+        } else {
+          alert("There was no order with the given ID!");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Failed to fetch order due to network error!");
       }
     } else {
-      alert("Check input! Only numbers and no empty input!")
+      alert("Check input! Only numbers and no empty input!");
     }
   };
 
   const getAllOrders = async (event) => {
     event.preventDefault();
-    const response = await fetch('http://localhost:3001/order');
-    const body = await response.json();
-    setAllSandwiches(body);
+    try {
+      const response = await fetch("http://localhost:3001/order");
+      const body = await response.json();
+      setAllSandwiches(body);
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Failed to fetch all orders due to network error!");
+    }
   };
 
   const chooseStatusColor = (state) => {
@@ -89,7 +107,7 @@ function App() {
   };
 
   return (
-    <div className="text-center bg-gradient-to-r from-blue-800 to-blue-500 min-h-screen flex flex-col items-center justify-center text-white">
+    <div className="text-center bg-slate-900 min-h-screen flex flex-col items-center justify-center text-white">
       <header>
         <h1 className="text-6xl mb-8">Sandwich App</h1>
         <div className="Order">
@@ -135,6 +153,13 @@ function App() {
             Check
           </button>
         </form>
+        {allSandwiches.map((sandwich) => (
+          <li key={sandwich.id} className="list-none">
+            Sandwich ID: {sandwich.id} | Name: {sandwich.name} | Price:{" "}
+            {sandwich.price}
+            <img src={sandwich.image} alt={sandwich.name} />
+          </li>
+        ))}
 
         <h4>
           Order ID: {fetchedOrderId} | Sandwich ID: {fetchedSandwichId} |
