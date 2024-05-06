@@ -1,37 +1,39 @@
 import { useEffect, useState } from 'react';
 import Navbar from './Navbar'
-/* 
-const orders = [
-    {
-        id: 1,
-        name: "Chicken Sandwich",
-        price: 7.99,
-        quantity: 1,
-        status: "not-ready",
-    },
-    {
-        id: 2,
-        name: "Veggie Sandwich",
-        price: 6.99,
-        quantity: 2,
-        status: "ready",
-    },
-    {
-        id: 3,	
-        name: "Turkey Sandwich",
-        price: 8.99,
-        quantity: 1,
-        status: "not-ready",
-    },
-    ]; */
+
+
 export default function OrderStatus() {
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
-    fetch('http://localhost:3001/order')
-      .then(response => response.json())
-      .then(data => setOrders(data))
-      .catch(error => console.error('Error fetching orders:', error));
+    fetch("http://localhost:3001/order")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch orders");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setOrders(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError(error.message);
+        setLoading(false);
+      });
   }, []);
+  console.log(orders);
+
+  if (loading) {
+    return <p className="text-center">Loading orders...</p>;
+  }
+
+  if (error) {
+    return <p className="text-center text-red-500">{error}</p>;
+  }
+
   return (
     <>
      <Navbar />
@@ -63,15 +65,17 @@ export default function OrderStatus() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {orders.map(order => (
-                <tr key={order.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">{order.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{order.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">${order.price}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{order.quantity}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{order.status}</td>
-                </tr>
-              ))}
+              {orders.map((order) =>
+                order.sandwiches.map((sandwich) => (
+                  <tr key={`${order.id}-${sandwich.id}`}>
+                    <td>{order.id}</td>
+                    <td>{sandwich.sandwichName}</td>
+                    <td>{new Date(order.createdDate).toLocaleString()}</td>
+                    <td>{sandwich.quantity}</td>
+                    <td>{order.status}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

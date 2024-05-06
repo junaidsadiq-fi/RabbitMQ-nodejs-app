@@ -1,16 +1,17 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import ReactDOM from 'react-dom'; 
 import './index.css';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
+import { CartProvider } from './Provider/CartContext';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
+ReactDOM.render(
   <BrowserRouter>
-   <ToastContainer />
+    <CartProvider>
+      <ToastContainer />
       <App />
-  </BrowserRouter>
+    </CartProvider>
+  </BrowserRouter>,
+  document.getElementById('root')
 );
-
-

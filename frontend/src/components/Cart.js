@@ -1,49 +1,92 @@
-import React from 'react';
-import Navbar from './Navbar';
+import { useContext, useState } from "react";
 
-const Cart = ({ cartItems, buyNow }) => {
+import Navbar from "./Navbar";
+import { CartContext } from "../Provider/CartContext";
+import { toast } from "react-toastify";
+
+export default function Cart() {
+  const { cart, setCart, incrementQuantity, decrementQuantity, removeFromCart } = useContext(
+    CartContext
+  );
+  const [orderPlaced, setOrderPlaced] = useState(false);
+  
+  const handleConfirmOrder = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(cart),
+        mode: 'cors',
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        setOrderPlaced(true);
+        toast.success('Order placed successfully!');
+         setCart([]);
+      } else {
+        toast.error('Failed to place order.');
+        console.log(response);
+      }
+    } catch (error) {
+      toast.error('Failed to place order.');
+      console.error(error);
+    }
+  };
+
   return (
     <>
       <Navbar />
-      <div className="max-w-3xl mt-8 mx-auto">
-        <h2 className="text-3xl font-bold mb-4 text-center">Cart</h2>
-        <div className="m-4 border rounded-lg p-4">
-          {cartItems && cartItems.length > 0 ? (
-            <ul className="divide-y divide-gray-200">
-              {cartItems.map((item, index) => (
-                <li key={index} className="py-4 flex items-center justify-between">
-                  <div className="flex items-center">
+      <div className="mx-auto max-w-xl mt-16">
+        <h1 className="text-2xl text-center font-bold mt-8 mb-4">Your Shopping Cart</h1>
+        {cart.length === 0 ? (
+          <p>Your cart is empty.</p>
+        ) : (
+          <ul className="divide-y divide-gray-200">
+            {cart.map((item) => (
+              <li key={item.id} className="py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex space-x-4">
                     <img
+                      className="h-10 w-10 rounded-full"
                       src={item.image}
                       alt={item.name}
-                      className="w-16 h-16 object-cover rounded mr-4"
                     />
-                    <div>
-                      <p className="font-bold">{item.name}</p>
-                      <p className="text-gray-700">${item.price}</p>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <p className="text-lg font-semibold">{item.name}</p>
+                        <p className="text-gray-700">${item.price}</p>
+                      </div>
+                      <p className="text-gray-500">{item.description}</p>
                     </div>
                   </div>
-                  <p>{item.quantity}x</p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-center">Your cart is empty.</p>
-          )}
-        </div>
-        {cartItems && cartItems.length > 0 && (
-          <div className="mt-8 flex justify-end">
+                  <div className="flex items-center">
+                    <button
+                      onClick={() => removeFromCart(item.id)}
+                      className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded ml-4"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              </li>
+            ))}
+            
+          </ul>
+        )}
+        {cart.length > 0 && (
+          <div className="flex justify-end mt-4">
             <button
-              onClick={buyNow}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded focus:outline-none"
+              onClick={handleConfirmOrder}
+              className="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 rounded focus:outline-none"
             >
-              Buy Now
+              Confirm Order
             </button>
           </div>
         )}
       </div>
     </>
   );
-};
-
-export default Cart;
+}

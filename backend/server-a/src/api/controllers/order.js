@@ -3,17 +3,14 @@ const WebSocket = require('ws');
 const rabbitHost = process.env.RABBIT_HOST || 'localhost'; 
 let orders = new Map();
 
-exports.getAllOrders = (req, res) => {
-  const allOrders = Array.from(orders.values());
-  res.json(allOrders);
-};
 
 exports.createOrder = (req, res) => {
-  if (!req.body || !Array.isArray(req.body.sandwiches)) {
+  console.log(req.body)
+  if (!req.body) {
     return res.status(400).json({ error: 'Invalid sandwiches data' });
   }
 
-  const newOrder = createNewOrder(req.body.sandwiches);
+  const newOrder = createNewOrder(req.body);
   orders.set(newOrder.id, newOrder);
 
   addTask(rabbitHost, "order_queue", newOrder);
@@ -21,10 +18,15 @@ exports.createOrder = (req, res) => {
   res.status(201).json(newOrder);
 };
 
+exports.getAllOrders = (req, res) => {
+  const allOrders = Array.from(orders.values());
+  res.json(allOrders);
+};
+
 exports.getOrder = (req, res) => {
   const order = orders.get(parseInt(req.params.orderId));
   if (!order) {
-    res.status(404).send("Order not found.");
+    res.status(404).send("not-found.");
   } else {
     res.json(order);
   }
@@ -43,13 +45,18 @@ exports.updateOrderStatus = (order, wss) => {
 };
 
 function createNewOrder(sandwiches) {
+  const orderSandwiches = sandwiches.map((sandwich) => ({
+    sandwichId: sandwich.id,
+    sandwichName: sandwich.name,
+    quantity: sandwich.quantity,
+    price: sandwich.price,
+    image: sandwich.image,
+    description: sandwich.description,
+  }));
+
   return {
     id: orders.size + 1,
-    sandwiches: sandwiches.map((sandwich) => ({
-      sandwichId: sandwich.sandwichId,
-      sandwichName: sandwich.sandwichName,
-      quantity: sandwich.quantity,
-    })),
+    sandwiches: orderSandwiches,
     status: "ordered",
     createdDate: new Date(),
   };
